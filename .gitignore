@@ -7,6 +7,7 @@ dist/
 release/
 build-bridge.out
 workflow_agent_release.zip
+electron/resources/windows-use-bridge.exe
 
 # Python caches and envs
 __pycache__/

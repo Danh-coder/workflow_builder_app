@@ -54,6 +54,12 @@ Installer output:
 
 - `release/Workflow Agent Setup 0.1.0.exe`
 
+Generated bridge artifact (not committed to git):
+
+- `electron/resources/windows-use-bridge.exe`
+
+The bridge executable is intentionally build-generated and ignored by git to keep repository size manageable. Run `npm run build-bridge` (or `npm run dist:full`) before packaging.
+
 ### Build in separate steps
 
 ```powershell
