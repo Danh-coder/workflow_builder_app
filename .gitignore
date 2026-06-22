@@ -1,0 +1,23 @@
+# Node and frontend artifacts
+node_modules/
+dist/
+*.log
+
+# Electron packaging outputs
+release/
+build-bridge.out
+workflow_agent_release.zip
+
+# Python caches and envs
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+Windows-Use/.venv/
+Windows-Use/build/
+Windows-Use/dist/
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/

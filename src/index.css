@@ -1,0 +1,169 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    /* Prevent text selection on UI elements */
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Allow text selection inside content areas */
+  p, span.selectable, input, textarea, code, pre {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  body {
+    background-color: #07090E;
+    color: #F1F5F9;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Custom scrollbars */
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #1E2435;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #2D3452;
+  }
+
+  /* Selection */
+  ::selection {
+    background: rgba(99, 102, 241, 0.3);
+    color: #F1F5F9;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-medium rounded-lg px-4 py-2 text-sm transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2;
+  }
+
+  .btn-secondary {
+    @apply bg-surface-3 hover:bg-surface-4 active:bg-surface-3 text-slate-300 hover:text-slate-100 border border-border font-medium rounded-lg px-4 py-2 text-sm transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2;
+  }
+
+  .btn-ghost {
+    @apply hover:bg-surface-3 active:bg-surface-4 text-slate-400 hover:text-slate-200 font-medium rounded-lg px-3 py-2 text-sm transition-all duration-150 flex items-center gap-2;
+  }
+
+  .btn-danger {
+    @apply bg-red-600/10 hover:bg-red-600/20 text-red-400 hover:text-red-300 border border-red-500/20 hover:border-red-500/40 font-medium rounded-lg px-4 py-2 text-sm transition-all duration-150 flex items-center gap-2;
+  }
+
+  .card {
+    @apply bg-surface-2 border border-border rounded-xl;
+  }
+
+  .card-elevated {
+    @apply bg-surface-3 border border-border rounded-xl;
+  }
+
+  .input-base {
+    @apply bg-surface-1 border border-border rounded-lg text-slate-200 placeholder-slate-500 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 transition-colors;
+  }
+
+  .nav-item {
+    @apply flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer;
+  }
+
+  .nav-item-inactive {
+    @apply text-slate-400 hover:text-slate-200 hover:bg-surface-3;
+  }
+
+  .nav-item-active {
+    @apply text-indigo-300 bg-accent-100 border border-accent-200;
+  }
+
+  .section-header {
+    @apply text-xs font-semibold text-slate-500 uppercase tracking-widest px-3 mb-1;
+  }
+}
+
+/* Electron window drag regions */
+.drag-region    { -webkit-app-region: drag; }
+.no-drag        { -webkit-app-region: no-drag; }
+
+/* Glow effects */
+.glow-indigo {
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+}
+
+.glow-cyan {
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.15);
+}
+
+/* Typing indicator dots */
+.typing-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #6366F1;
+  animation: typingBounce 1.4s ease-in-out infinite;
+}
+
+.typing-dot:nth-child(1) { animation-delay: 0s; }
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+  30% { transform: translateY(-6px); opacity: 1; }
+}
+
+/* Progress bar animation */
+@keyframes progressPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.progress-running {
+  animation: progressPulse 2s ease-in-out infinite;
+}
+
+/* Step connector line */
+.step-connector {
+  width: 2px;
+  background: linear-gradient(to bottom, #1E2435, #1E2435);
+  flex-shrink: 0;
+}
+
+.step-connector-done {
+  background: linear-gradient(to bottom, #10B981, #1E2435);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #818CF8, #06B6D4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Noise texture overlay for depth */
+.surface-noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+}
