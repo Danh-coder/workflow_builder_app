@@ -80,7 +80,11 @@ ipcMain.on('window-close', () => mainWindow?.close());
 ipcMain.handle('http-request', async (_event, { method, url, headers, body }) => {
   try {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 12000);
+    // Longer timeout for local models (which may need time to generate responses)
+    // Use 120s for inference requests, 12s for model listing
+    const isInference = url.includes('/chat/completions') || url.includes('/completions');
+    const timeoutMs = isInference ? 120000 : 12000;
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
     const response = await fetch(url, {
       method: method ?? 'GET',
       headers: headers ?? {},

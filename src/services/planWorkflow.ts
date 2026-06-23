@@ -20,11 +20,14 @@ async function request(
     return api.httpRequest({ method, url, headers, body });
   }
   try {
+    // Longer timeout for chat completions (model inference)
+    const isInference = url.includes('/chat/completions') || url.includes('/completions');
+    const timeoutMs = isInference ? 120_000 : 30_000;
     const res = await fetch(url, {
       method,
       headers,
       body,
-      signal: AbortSignal.timeout(30_000),
+      signal: AbortSignal.timeout(timeoutMs),
     });
     const text = await res.text();
     return { ok: res.ok, status: res.status, text, error: null };

@@ -39,7 +39,7 @@ async function request(
       method,
       headers,
       body,
-      signal: AbortSignal.timeout(12000),
+      signal: AbortSignal.timeout(30000),
     });
     const text = await res.text();
     return { status: res.status, ok: res.ok, text, error: null };
