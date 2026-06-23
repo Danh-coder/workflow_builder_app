@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Bot, User, Sparkles, ChevronDown } from 'lucide-react';
+import { Bot, User, Sparkles, ChevronDown, Copy, Check } from 'lucide-react';
 import { ChatMessage, Workflow, ModelEntry } from '../types';
 import WorkflowPreviewCard from './WorkflowPreviewCard';
 import ChatInput from './ChatInput';
@@ -48,9 +48,17 @@ export default function ChatPanel({
 }: ChatPanelProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const [modelOpen, setModelOpen] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const modelDropRef = useRef<HTMLDivElement>(null);
 
   const activeEntry = modelEntries.find(m => m.id === defaultModelId) ?? modelEntries[0];
+
+  const handleCopyMessage = (text: string, messageId: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedId(messageId);
+      setTimeout(() => setCopiedId(null), 2000);
+    });
+  };
 
   useEffect(() => {
     if (!modelOpen) return;
@@ -170,7 +178,7 @@ export default function ChatPanel({
 
                 {/* Content */}
                 <div className={`flex flex-col gap-2 max-w-[85%] ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
-                  <div className={`rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                  <div className={`message-content rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                     msg.role === 'user'
                       ? 'bg-indigo-600 text-white rounded-tr-sm'
                       : 'bg-surface-2 border border-border text-slate-300 rounded-tl-sm'
@@ -182,6 +190,26 @@ export default function ChatPanel({
                       </span>
                     ))}
                   </div>
+                  {/* Copy button for user messages */}
+                  {msg.role === 'user' && (
+                    <button
+                      onClick={() => handleCopyMessage(msg.content, msg.id)}
+                      className="flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium transition-colors hover:bg-surface-3/50 text-slate-400 hover:text-slate-200"
+                      title="Copy message"
+                    >
+                      {copiedId === msg.id ? (
+                        <>
+                          <Check size={12} className="text-green-400" />
+                          <span className="text-green-400">Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy size={12} />
+                          <span>Copy</span>
+                        </>
+                      )}
+                    </button>
+                  )}
                   {/* Workflow preview card */}
                   {msg.workflowPreview && (
                     <WorkflowPreviewCard
