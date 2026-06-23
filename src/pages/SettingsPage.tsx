@@ -17,6 +17,13 @@ function uid() {
 
 const aiProviders: AIProvider[] = ['AIHoc', 'OpenAI', 'Gemini', 'Claude', 'Local Model'];
 
+const adapterPermissions = [
+  { id: 'accessibility',      name: 'Accessibility',        description: 'Required to control UI elements and read screen content.', granted: true },
+  { id: 'screen-recording',   name: 'Screen Recording',     description: 'Required to capture screenshots for debugging.',           granted: true },
+  { id: 'file-system',        name: 'File System',          description: 'Required to read/write files during automation.',          granted: false },
+  { id: 'browser-automation', name: 'Browser Automation',   description: 'Required to control web browsers.',                       granted: true },
+];
+
 // ── Sub-components ─────────────────────────────────────────────────
 function SectionTitle({ icon: Icon, label }: { icon: React.ElementType; label: string }) {
   return (
@@ -648,6 +655,35 @@ export default function SettingsPage({
                   {settings.adapterStatus !== 'Not Connected' ? 'Connected' : 'Disconnected'}
                 </span>
               </div>
+            </div>
+            <div className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Permissions</div>
+            <div className="space-y-2">
+              {adapterPermissions.map(perm => (
+                <div key={perm.id} className="flex items-start gap-3 p-3 bg-surface-3 border border-border rounded-lg">
+                  <div className={clsx(
+                    'w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5',
+                    perm.granted ? 'bg-emerald-500/10 border border-emerald-500/30' : 'bg-surface-4 border border-border',
+                  )}>
+                    {perm.granted ? <CheckCircle size={13} className="text-emerald-400" /> : <AlertCircle size={13} className="text-slate-500" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs font-semibold text-slate-300 mb-0.5">{perm.name}</div>
+                    <div className="text-[11px] text-slate-500 leading-relaxed">{perm.description}</div>
+                  </div>
+                  <button
+                    disabled
+                    title="Permission controls are managed by the app"
+                    className={clsx(
+                      'text-[11px] font-medium px-2.5 py-1 rounded-lg border transition-colors flex-shrink-0 mt-0.5 cursor-not-allowed opacity-60',
+                      perm.granted
+                        ? 'text-slate-500 border-border'
+                        : 'text-indigo-400 border-indigo-500/30 bg-accent-50',
+                    )}
+                  >
+                    {perm.granted ? 'Revoke' : 'Grant'}
+                  </button>
+                </div>
+              ))}
             </div>
           </section>
 
