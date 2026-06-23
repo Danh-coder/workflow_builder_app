@@ -77,12 +77,12 @@ CORE INTERACTION TOOLS
 
 BROWSER & WEB TOOLS
 ────────────────────
-• app_tool (launch browser)  — Open the browser. ALWAYS use the browser the user is currently running
-                    (check Desktop State for an open browser window: Edge, Chrome, Firefox, Brave, etc.).
-                    If a browser is already open, do NOT reuse that window — open a NEW window instead
-                    using shortcut_tool(ctrl+n) while that browser is focused.
-                    Only fall back to launching a browser app if NO browser is currently open.
-                    NEVER default to "Google Chrome" unless the user explicitly requests it.
+• app_tool (launch browser)  — Open the browser.
+                    When the user names a specific browser (e.g. "Google Chrome"), use that exact name.
+                    Use the FULL Start Menu name: "Google Chrome" (not "Chrome"), "Microsoft Edge", "Mozilla Firefox".
+                    If no browser is specified, use whichever browser is currently open in Desktop State.
+                    After launching OR switching to ANY browser, ALWAYS open a new window with
+                    shortcut_tool(ctrl+n) before navigating — never reuse an existing window/tab.
 • type_tool on address bar  — Navigate to a URL (click address bar, type URL, press Enter)
 • scrape_tool     — Extract full readable text from the current browser page via accessibility tree
                     returns markdown of page content with scroll position info
@@ -137,11 +137,13 @@ WORKFLOW PLANNING RULES
 
 3. NAVIGATION PATTERN — Standard browser navigation sequence:
    a. Check Desktop State for an already-open browser window.
-   b. If a browser IS open: app_tool(switch to that browser) → shortcut_tool(ctrl+n) → wait(1s)
-      so a new empty window opens without disturbing the user's existing browsing session.
-   c. If NO browser is open: app_tool(launch the user's default/current browser) → wait(3-5s).
-   d. type_tool(address bar, URL, press_enter=true) → wait(2-3s) → [interact]
-   NEVER reuse the user's existing browser window/tab. NEVER default to Chrome unless explicitly asked.
+   b. If a browser IS open:  app_tool(switch, <browser name>) → shortcut_tool(ctrl+n) → wait_tool(1)
+   c. If NO browser is open: app_tool(launch "Google Chrome" or user-specified browser) → wait_tool(3)
+      then STILL run shortcut_tool(ctrl+n) → wait_tool(1) to guarantee a fresh tab.
+   d. type_tool(address bar, URL, press_enter=true) → wait_tool(2) → [interact]
+   ⚠ shortcut_tool(ctrl+n) is MANDATORY in every browser workflow step — never skip it.
+   ⚠ Use "Google Chrome" (full name) when Chrome is requested — NOT the short alias "Chrome".
+   ⚠ NEVER reuse the user's existing browser window/tab.
 
 4. LOGIN PATTERN — Standard login sequence:
    type_tool(username field) → type_tool(password field) → click_tool(login button) OR shortcut_tool(enter)
@@ -213,23 +215,23 @@ WORKFLOW PLANNING RULES
 
 11. STEP COUNT — Aim for 6-20 steps. More is better than vague.
 
-12. APP NAMES FOR APP_TOOL — When generating a launch step, always use the short common name,
-    NOT the full Microsoft-prefixed name, NOT a sentence, NOT an exe path:
+12. APP NAMES FOR APP_TOOL — Use the exact name as it appears in the Windows Start Menu:
     ✅ "Notepad" | "Word" | "Excel" | "PowerPoint" | "Paint" | "Calculator" |
-       "File Explorer" | "Edge" | "Chrome" | "Firefox" | "Outlook" | "Teams"
+       "File Explorer" | "Microsoft Edge" | "Google Chrome" | "Mozilla Firefox" |
+       "Outlook" | "Teams" | "Vivaldi" | "Brave"
+    ⚠ BROWSERS require their full name: "Google Chrome" NOT "Chrome", "Microsoft Edge" NOT "Edge".
     ❌ Do NOT use: "Microsoft Notepad", "Open Word", "winword.exe", "Launch Excel application"
-    The launch mode searches the Start Menu by fuzzy name — short names always match best.
 
-13. NEW DOCUMENT / NEW TAB PATTERN (NOTEPAD, WORD, EXCEL)
-   When the user asks to open Notepad/Word/Excel and start fresh content, use UI actions,
-   not shell process launching:
-   a. app_tool(launch "Notepad" | "Word" | "Excel") OR app_tool(switch) if already open.
-   b. wait_tool(2-3s) after launch/switch.
-   c. shortcut_tool(ctrl+n) to create a NEW tab/document.
-     - For Notepad on Windows 11, ctrl+n opens a new tab.
-     - For Word/Excel, ctrl+n creates a new blank document/workbook.
-   d. wait_tool(1s) and continue typing.
-   Do NOT use shell_tool just to open these apps unless the user explicitly asks for shell commands.
+13. NOTEPAD / WORD / EXCEL — ALWAYS OPEN A NEW TAB OR DOCUMENT
+   Every workflow that involves Notepad, Word, or Excel MUST include these steps IN ORDER,
+   with NO exceptions, even for simple tasks:
+   Step A → actionType: "app_tool",      target: "launch Notepad"  (or Word / Excel)
+   Step B → actionType: "wait_tool",     target: "3"
+   Step C → actionType: "shortcut_tool", target: "ctrl+n"   ← MANDATORY — opens a fresh tab/document
+   Step D → actionType: "wait_tool",     target: "1"
+   Step E → (continue with type_tool, shortcut_tool, etc.)
+   ⚠ NEVER skip Step C. The ctrl+n step MUST appear as its own explicit step in the steps array.
+   ⚠ Do NOT use shell_tool to launch these apps — always use app_tool.
 
 ═══════════════════════════════════════════════════════════
 OUTPUT FORMAT
