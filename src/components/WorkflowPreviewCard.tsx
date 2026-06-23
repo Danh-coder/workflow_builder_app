@@ -5,7 +5,6 @@ import {
   Monitor,
   CheckCircle,
   Play,
-  Save,
   Eye,
   ChevronRight,
   Layers,
@@ -30,7 +29,6 @@ interface WorkflowPreviewCardProps {
   workflow: Workflow;
   deleted?: boolean;
   onPreviewSteps: (workflow: Workflow) => void;
-  onSaveWorkflow: (workflow: Workflow) => void;
   onRunNow: (workflow: Workflow) => void;
 }
 
@@ -38,7 +36,6 @@ export default function WorkflowPreviewCard({
   workflow,
   deleted = false,
   onPreviewSteps,
-  onSaveWorkflow,
   onRunNow,
 }: WorkflowPreviewCardProps) {
   const riskColor =
@@ -132,13 +129,6 @@ export default function WorkflowPreviewCard({
             >
               <Eye size={13} />
               Preview Steps
-            </button>
-            <button
-              onClick={() => onSaveWorkflow(workflow)}
-              className="btn-secondary text-xs py-1.5 flex-1 justify-center"
-            >
-              <Save size={13} />
-              Save
             </button>
             <button
               onClick={() => onRunNow(workflow)}

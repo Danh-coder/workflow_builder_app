@@ -115,11 +115,6 @@ export default function Sidebar({
             >
               <Icon size={16} className="flex-shrink-0" />
               <span>{label}</span>
-              {id === 'runs' && (
-                <span className="ml-auto text-[10px] bg-indigo-500/15 text-indigo-400 px-1.5 py-0.5 rounded-full font-medium">
-                  8
-                </span>
-              )}
             </button>
           ))}
         </div>

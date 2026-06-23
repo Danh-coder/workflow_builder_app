@@ -1,18 +1,14 @@
 import { useState, useRef, KeyboardEvent } from 'react';
-import { Send, Paperclip, Monitor, Wand2, AlertTriangle } from 'lucide-react';
+import { Send, Wand2 } from 'lucide-react';
 
 interface ChatInputProps {
   onSend: (message: string) => void;
   isGenerating: boolean;
-  askBeforeRiskyActions: boolean;
-  onToggleRiskyActions: () => void;
 }
 
 export default function ChatInput({
   onSend,
   isGenerating,
-  askBeforeRiskyActions,
-  onToggleRiskyActions,
 }: ChatInputProps) {
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -57,33 +53,7 @@ export default function ChatInput({
           style={{ maxHeight: '200px', minHeight: '44px' }}
         />
         {/* Toolbar */}
-        <div className="flex items-center justify-between px-3 pb-2.5 gap-2">
-          <div className="flex items-center gap-1">
-            <button
-              className="p-1.5 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-surface-4 transition-colors"
-              title="Attach file"
-            >
-              <Paperclip size={15} />
-            </button>
-            <button
-              className="p-1.5 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-surface-4 transition-colors"
-              title="Use current screen context"
-            >
-              <Monitor size={15} />
-            </button>
-            <button
-              onClick={onToggleRiskyActions}
-              className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-[11px] font-medium transition-colors ${
-                askBeforeRiskyActions
-                  ? 'text-amber-400 bg-amber-500/10 border border-amber-500/20'
-                  : 'text-slate-500 hover:text-slate-400 hover:bg-surface-4'
-              }`}
-              title="Ask before risky actions"
-            >
-              <AlertTriangle size={11} />
-              Ask before risky
-            </button>
-          </div>
+        <div className="flex items-center justify-end px-3 pb-2.5 gap-2">
           <div className="flex items-center gap-2">
             {isGenerating ? (
               <div className="flex items-center gap-2 text-xs text-indigo-400">

@@ -216,7 +216,6 @@ export default function ChatPanel({
                       workflow={msg.workflowPreview}
                       deleted={deletedWorkflowIds.has(msg.workflowPreview.id)}
                       onPreviewSteps={onPreviewSteps}
-                      onSaveWorkflow={onSaveWorkflow}
                       onRunNow={onRunNow}
                     />
                   )}
@@ -249,8 +248,6 @@ export default function ChatPanel({
       <ChatInput
         onSend={onSend}
         isGenerating={isGenerating}
-        askBeforeRiskyActions={askBeforeRiskyActions}
-        onToggleRiskyActions={onToggleRiskyActions}
       />
     </div>
   );
