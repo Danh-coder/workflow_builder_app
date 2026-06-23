@@ -1,12 +1,12 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import {
-  Cpu, Monitor, Shield, Settings, Key, CheckCircle, AlertCircle,
-  ChevronDown, ChevronUp, Eye, EyeOff, Globe, FolderOpen,
-  Plus, Trash2, Hash, RefreshCw, Clock, Info, Wifi, WifiOff,
+  Cpu, Monitor, Shield, Key, CheckCircle, AlertCircle,
+  ChevronDown, ChevronUp, Eye, EyeOff, Globe,
+  Trash2, Hash, RefreshCw, Clock, Info, Wifi, WifiOff,
 } from 'lucide-react';
 import clsx from 'clsx';
-import { AppSettings, AIProvider, ModelEntry, Permission } from '../types';
-import { loadSettings, saveSettings, clearSettings } from '../services/settingsStore';
+import { AppSettings, AIProvider, ModelEntry } from '../types';
+import { loadSettings, saveSettings } from '../services/settingsStore';
 import { testConnection, TestResult, fetchModels, FetchedModel } from '../services/connectionTest';
 import { providerDefaults } from '../data/mockData';
 
@@ -16,13 +16,6 @@ function uid() {
 }
 
 const aiProviders: AIProvider[] = ['AIHoc', 'OpenAI', 'Gemini', 'Claude', 'Local Model'];
-
-const defaultPermissions: Permission[] = [
-  { id: 'accessibility',      name: 'Accessibility',        description: 'Required to control UI elements and read screen content.', granted: true },
-  { id: 'screen-recording',   name: 'Screen Recording',     description: 'Required to capture screenshots for debugging.',           granted: true },
-  { id: 'file-system',        name: 'File System',          description: 'Required to read/write files during automation.',          granted: false },
-  { id: 'browser-automation', name: 'Browser Automation',   description: 'Required to control web browsers.',                       granted: true },
-];
 
 // ── Sub-components ─────────────────────────────────────────────────
 function SectionTitle({ icon: Icon, label }: { icon: React.ElementType; label: string }) {
@@ -45,25 +38,29 @@ function FieldLabel({ children, hint }: { children: React.ReactNode; hint?: stri
   );
 }
 
-function Toggle({ checked, onChange, label, description }: {
-  checked: boolean; onChange: () => void; label: string; description?: string;
+function Toggle({ checked, onChange, label, description, disabled = false }: {
+  checked: boolean; onChange?: () => void; label: string; description?: string; disabled?: boolean;
 }) {
   return (
-    <div className="flex items-start justify-between py-3 gap-4">
+    <div className={clsx('flex items-start justify-between py-3 gap-4', disabled && 'cursor-not-allowed')}>
       <div className="flex-1 min-w-0">
         <div className="text-sm text-slate-300">{label}</div>
         {description && <div className="text-xs text-slate-600 mt-0.5">{description}</div>}
       </div>
       <button
-        onClick={onChange}
+        onClick={disabled ? undefined : onChange}
+        disabled={disabled}
+        aria-disabled={disabled}
+        title={disabled ? 'This setting is managed by the app' : undefined}
         className={clsx(
           'relative w-10 h-5 rounded-full transition-colors duration-200 focus:outline-none flex-shrink-0 mt-0.5',
+          disabled ? 'cursor-not-allowed opacity-70' : 'cursor-pointer',
           checked ? 'bg-indigo-600' : 'bg-surface-4 border border-border',
         )}
       >
         <span className={clsx(
-          'absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200',
-          checked ? 'translate-x-5' : 'translate-x-0.5',
+          'absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200',
+          checked ? 'translate-x-5' : 'translate-x-0',
         )} />
       </button>
     </div>
@@ -184,7 +181,6 @@ export default function SettingsPage({
   const [fetchingModels, setFetchingModels] = useState(false);
   const [fetchModelsError, setFetchModelsError] = useState<string | null>(null);
   const [showApiKey, setShowApiKey] = useState(false);
-  const [permissions, setPermissions] = useState<Permission[]>(defaultPermissions);
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState<TestResult | null>(null);
   const [saved, setSaved] = useState(false);
@@ -567,19 +563,6 @@ export default function SettingsPage({
                 </div>
               )}
 
-              {/* Token budget */}
-              <div className="mt-4">
-                <FieldLabel hint="max tokens per workflow run">Token Budget</FieldLabel>
-                <input
-                  type="number"
-                  value={settings.tokenBudget}
-                  onChange={e => update({ tokenBudget: Number(e.target.value) })}
-                  className="input-base w-full px-3 py-2 text-sm"
-                  step={5000}
-                  min={1000}
-                  max={500000}
-                />
-              </div>
             </div>
           </section>
 
@@ -666,93 +649,15 @@ export default function SettingsPage({
                 </span>
               </div>
             </div>
-            <div className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Permissions</div>
-            <div className="space-y-2">
-              {permissions.map(perm => (
-                <div key={perm.id} className="flex items-start gap-3 p-3 bg-surface-3 border border-border rounded-lg">
-                  <div className={clsx(
-                    'w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5',
-                    perm.granted ? 'bg-emerald-500/10 border border-emerald-500/30' : 'bg-surface-4 border border-border',
-                  )}>
-                    {perm.granted ? <CheckCircle size={13} className="text-emerald-400" /> : <AlertCircle size={13} className="text-slate-500" />}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs font-semibold text-slate-300 mb-0.5">{perm.name}</div>
-                    <div className="text-[11px] text-slate-500 leading-relaxed">{perm.description}</div>
-                  </div>
-                  <button
-                    onClick={() => setPermissions(prev => prev.map(p => p.id === perm.id ? { ...p, granted: !p.granted } : p))}
-                    className={clsx(
-                      'text-[11px] font-medium px-2.5 py-1 rounded-lg border transition-colors flex-shrink-0 mt-0.5',
-                      perm.granted
-                        ? 'text-slate-500 border-border hover:text-slate-300 hover:bg-surface-4'
-                        : 'text-indigo-400 border-indigo-500/30 bg-accent-50 hover:bg-accent-100',
-                    )}
-                  >
-                    {perm.granted ? 'Revoke' : 'Grant'}
-                  </button>
-                </div>
-              ))}
-            </div>
           </section>
 
           {/* ── Security ────────────────────────────────────────── */}
           <section className="card p-5">
             <SectionTitle icon={Shield} label="Security" />
             <div className="divide-y divide-border">
-              <Toggle checked={settings.storeApiKeySecurely} onChange={() => update({ storeApiKeySecurely: !settings.storeApiKeySecurely })} label="Store API key securely" description="Saves the key in the OS keychain instead of plain localStorage." />
-              <Toggle checked={settings.askBeforeRiskyActions} onChange={() => update({ askBeforeRiskyActions: !settings.askBeforeRiskyActions })} label="Ask confirmation before risky actions" description="Prompts before submitting forms, sending messages, or deleting files." />
-              <Toggle checked={settings.blockDestructiveActions} onChange={() => update({ blockDestructiveActions: !settings.blockDestructiveActions })} label="Block payment & destructive actions by default" description="Requires explicit override to run steps that make purchases or irreversible changes." />
-              <Toggle checked={settings.saveScreenshotsOnError} onChange={() => update({ saveScreenshotsOnError: !settings.saveScreenshotsOnError })} label="Save screenshots on error only" description="Captures the screen only when a step fails, to save disk space." />
-            </div>
-          </section>
-
-          {/* ── App Settings ────────────────────────────────────── */}
-          <section className="card p-5">
-            <SectionTitle icon={Settings} label="App Settings" />
-            <div className="mb-4">
-              <FieldLabel>Theme</FieldLabel>
-              <div className="flex items-center gap-2">
-                {(['dark', 'light', 'system'] as const).map(t => (
-                  <button
-                    key={t}
-                    onClick={() => update({ theme: t })}
-                    className={clsx(
-                      'flex-1 py-2 rounded-lg text-sm font-medium capitalize border transition-colors',
-                      settings.theme === t
-                        ? 'bg-indigo-600/10 text-indigo-300 border-indigo-500/30'
-                        : 'bg-surface-3 text-slate-500 border-border hover:text-slate-300',
-                    )}
-                  >
-                    {t}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="mb-4">
-              <FieldLabel>Local Data Path</FieldLabel>
-              <div className="relative">
-                <FolderOpen size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
-                <input
-                  type="text"
-                  value={settings.localDataPath}
-                  onChange={e => update({ localDataPath: e.target.value })}
-                  className="input-base w-full pl-9 pr-3 py-2 font-mono text-xs"
-                  spellCheck={false}
-                />
-              </div>
-            </div>
-            <div className="divide-y divide-border">
-              <Toggle checked={settings.autoUpdate} onChange={() => update({ autoUpdate: !settings.autoUpdate })} label="Auto-update app" />
-            </div>
-            <div className="mt-5 p-3 bg-red-500/5 border border-red-500/20 rounded-lg">
-              <div className="text-xs font-semibold text-red-400 mb-2">Danger Zone</div>
-              <button
-                onClick={() => { if (window.confirm('Clear all saved workflow history and logs?')) clearSettings(); }}
-                className="btn-danger text-xs py-1.5"
-              >
-                Clear workflow history &amp; logs
-              </button>
+              <Toggle checked={settings.storeApiKeySecurely} disabled label="Store API key securely" description="Saves the key in the OS keychain instead of plain localStorage." />
+              <Toggle checked={settings.askBeforeRiskyActions} disabled label="Ask confirmation before risky actions" description="Prompts before submitting forms, sending messages, or deleting files." />
+              <Toggle checked={settings.blockDestructiveActions} disabled label="Block payment & destructive actions by default" description="Requires explicit override to run steps that make purchases or irreversible changes." />
             </div>
           </section>
 
