@@ -8,6 +8,7 @@ import RunsPage from './pages/RunsPage';
 import LogsPage from './pages/LogsPage';
 import SettingsPage from './pages/SettingsPage';
 import ConfirmationModal from './components/ConfirmationModal';
+import CursorTrail from './components/CursorTrail';
 
 import {
   NavPage,
@@ -38,12 +39,161 @@ function now() {
   return new Date().toISOString();
 }
 
+function LightningEffect({ frequency }: { frequency: number }) {
+  const [flashKey, setFlashKey] = useState(0);
+
+  useEffect(() => {
+    if (frequency === 0) return;
+
+    let timerId: NodeJS.Timeout;
+    const pct = (100 - frequency) / 100;
+    
+    const triggerFlash = () => {
+      setFlashKey(prev => prev + 1);
+      
+      const minDelay = 1500 + pct * 28500; // 1.5s to 30s
+      const maxDelay = 4000 + pct * 86000; // 4s to 90s
+      const delay = minDelay + Math.random() * (maxDelay - minDelay);
+      
+      timerId = setTimeout(triggerFlash, delay);
+    };
+
+    const initialMin = 2000 + pct * 15000;
+    const initialMax = 5000 + pct * 35000;
+    const initialDelay = initialMin + Math.random() * (initialMax - initialMin);
+    
+    timerId = setTimeout(triggerFlash, initialDelay);
+
+    return () => clearTimeout(timerId);
+  }, [frequency]);
+
+  if (frequency === 0 || flashKey === 0) return null;
+
+  return (
+    <div 
+      key={flashKey} 
+      className="pointer-events-none fixed inset-0 z-[100] animate-lightning-single mix-blend-overlay bg-white" 
+    />
+  );
+}
+
+function ElectricEffect({ frequency }: { frequency: number }) {
+  const [flashKey, setFlashKey] = useState(0);
+  const [bolt, setBolt] = useState<{ points: string; x: number } | null>(null);
+
+  useEffect(() => {
+    if (frequency === 0) return;
+
+    let timerId: NodeJS.Timeout;
+    const pct = (100 - frequency) / 100;
+    
+    const triggerFlash = () => {
+      // Generate a random lightning bolt path
+      const startX = 100 + Math.random() * (window.innerWidth - 200);
+      const segments = 8 + Math.floor(Math.random() * 6);
+      const segHeight = window.innerHeight / segments;
+      let x = startX;
+      const pts: string[] = [`${x},0`];
+      
+      for (let i = 1; i <= segments; i++) {
+        const jitter = (Math.random() - 0.5) * 120;
+        x = startX + jitter;
+        pts.push(`${x},${Math.round(segHeight * i)}`);
+      }
+      
+      setBolt({ points: pts.join(' '), x: startX });
+      setFlashKey(prev => prev + 1);
+      
+      const minDelay = 1200 + pct * 23800;
+      const maxDelay = 3000 + pct * 57000;
+      const delay = minDelay + Math.random() * (maxDelay - minDelay);
+      
+      timerId = setTimeout(triggerFlash, delay);
+    };
+
+    const initialMin = 1500 + pct * 10000;
+    const initialMax = 4000 + pct * 25000;
+    const initialDelay = initialMin + Math.random() * (initialMax - initialMin);
+    
+    timerId = setTimeout(triggerFlash, initialDelay);
+
+    return () => clearTimeout(timerId);
+  }, [frequency]);
+
+  if (frequency === 0 || flashKey === 0 || !bolt) return null;
+
+  return (
+    <div key={flashKey} className="pointer-events-none fixed inset-0 z-[100] electric-bolt-animate">
+      <svg width="100%" height="100%" className="absolute inset-0">
+        <defs>
+          <filter id={`bolt-glow-${flashKey}`} x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="6" result="blur1" />
+            <feGaussianBlur stdDeviation="12" result="blur2" />
+            <feMerge>
+              <feMergeNode in="blur2" />
+              <feMergeNode in="blur1" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+        {/* Wide glow layer */}
+        <polyline
+          points={bolt.points}
+          fill="none"
+          stroke="#facc15"
+          strokeWidth="6"
+          opacity="0.3"
+          filter={`url(#bolt-glow-${flashKey})`}
+        />
+        {/* Core bolt */}
+        <polyline
+          points={bolt.points}
+          fill="none"
+          stroke="#fde047"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          filter={`url(#bolt-glow-${flashKey})`}
+        />
+        {/* Bright center */}
+        <polyline
+          points={bolt.points}
+          fill="none"
+          stroke="#fffde7"
+          strokeWidth="1"
+          opacity="0.9"
+        />
+      </svg>
+    </div>
+  );
+}
+
 export default function App() {
   const [appSettings, setAppSettings] = useState<AppSettings>(() => loadSettings());
   const [currentPage, setCurrentPage] = useState<NavPage>('chat');
   const settingsDirty = useRef(false);
   const [unsavedModal, setUnsavedModal] = useState<NavPage | null>(null);
   const providerCache = useRef<Partial<Record<string, AppSettings>>>({});
+
+  // ── Theme Application ───────────────────────────────────────────
+  useEffect(() => {
+    document.documentElement.classList.remove('theme-light', 'theme-blossom', 'theme-rainy', 'theme-cyberpunk');
+    
+    if (appSettings.theme === 'light') {
+      document.documentElement.classList.add('theme-light');
+    } else if (appSettings.theme === 'blossom') {
+      document.documentElement.classList.add('theme-blossom');
+    } else if (appSettings.theme === 'rainy') {
+      document.documentElement.classList.add('theme-rainy');
+    } else if (appSettings.theme === 'cyberpunk') {
+      document.documentElement.classList.add('theme-cyberpunk');
+    } else if (appSettings.theme === 'system') {
+      // Handle 'system' if needed, for now treat as dark or use media query
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+        document.documentElement.classList.add('theme-light');
+      }
+    }
+  }, [appSettings.theme]);
 
   // ── Chat session persistence ──────────────────────────────────────
   const [chatSessions, setChatSessions] = useState<ChatSession[]>(() => loadSessions());
@@ -776,6 +926,7 @@ export default function App() {
         <main className="flex-1 h-full overflow-hidden">
           {currentPage === 'chat' && (
             <ChatPanel
+              theme={appSettings.theme}
               messages={messages}
               isGenerating={isGenerating}
               askBeforeRiskyActions={askBeforeRisky}
@@ -924,6 +1075,11 @@ export default function App() {
           onConfirm={confirmModal.onConfirm}
           onCancel={() => setConfirmModal(null)}
         />
+      )}
+      {appSettings.theme === 'rainy' && <LightningEffect frequency={appSettings.effectFrequency ?? 50} />}
+      {appSettings.theme === 'cyberpunk' && <ElectricEffect frequency={appSettings.effectFrequency ?? 50} />}
+      {(appSettings.theme === 'blossom' || appSettings.theme === 'rainy' || appSettings.theme === 'cyberpunk') && (
+        <CursorTrail theme={appSettings.theme} />
       )}
     </div>
   );

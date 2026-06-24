@@ -297,6 +297,7 @@ export const defaultSettings: AppSettings = {
   currentOS: 'Windows',
   adapterStatus: 'Win Use',
   theme: 'dark',
+  effectFrequency: 50,
   askBeforeRiskyActions: true,
   blockDestructiveActions: true,
   saveScreenshotsOnError: true,

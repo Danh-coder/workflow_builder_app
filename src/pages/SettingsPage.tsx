@@ -18,6 +18,7 @@ import {
     Info,
     Wifi,
     WifiOff,
+    Palette,
 } from "lucide-react";
 import clsx from "clsx";
 import { AppSettings, AIProvider, ModelEntry } from "../types";
@@ -1098,6 +1099,63 @@ export default function SettingsPage({
                                 </div>
                             ))}
                         </div>
+                    </section>
+
+                    {/* ── App Preferences ─────────────────────────────────── */}
+                    <section className="card p-5">
+                        <SectionTitle icon={Palette} label="App Preferences" />
+                        <div className="mb-4">
+                            <FieldLabel>Theme</FieldLabel>
+                            <div className="flex items-center gap-2">
+                                {(["dark", "light", "system", "blossom", "rainy", "cyberpunk"] as const).map((t) => (
+                                    <button
+                                        key={t}
+                                        onClick={() => update({ theme: t })}
+                                        className={clsx(
+                                            "px-4 py-2 rounded-xl text-xs font-medium border transition-colors capitalize",
+                                            settings.theme === t
+                                                ? "bg-indigo-600/15 text-indigo-400 border-indigo-500/30"
+                                                : "bg-surface-3 text-slate-500 border-border hover:text-slate-300"
+                                        )}
+                                    >
+                                        {t}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {(settings.theme === 'rainy' || settings.theme === 'cyberpunk') && (
+                            <div className="mt-4 pt-4 border-t border-border animate-fade-in">
+                                <div className="flex items-center justify-between mb-2">
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="text-xs font-medium text-slate-400">
+                                            {settings.theme === 'rainy' ? 'Lightning strike frequency' : 'Electric glitch frequency'}
+                                        </span>
+                                        <span className="text-[10px] text-slate-600">(Adjust effect timing)</span>
+                                    </div>
+                                    <span className="text-xs font-mono text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-md">
+                                        {settings.effectFrequency === 0 ? 'Off' : settings.effectFrequency === 100 ? 'Extreme' : `${settings.effectFrequency ?? 50}%`}
+                                    </span>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <span className="text-[10px] text-slate-500 font-medium">Rare</span>
+                                    <input
+                                        type="range"
+                                        min="0"
+                                        max="100"
+                                        value={settings.effectFrequency ?? 50}
+                                        onChange={(e) => update({ effectFrequency: parseInt(e.target.value, 10) })}
+                                        className="flex-1 h-1.5 bg-surface-3 rounded-lg appearance-none cursor-pointer accent-indigo-500 focus:outline-none"
+                                    />
+                                    <span className="text-[10px] text-slate-500 font-medium">Frequent</span>
+                                </div>
+                                <p className="text-[10px] text-slate-600 mt-1.5 leading-relaxed">
+                                    {settings.theme === 'rainy' 
+                                        ? 'Controls how often lightning flashes illuminate the rainy backdrop. Set to 0 to disable flashes completely.'
+                                        : 'Controls how often purple-yellow electric glitches arc across the screen. Set to 0 to disable glitches completely.'}
+                                </p>
+                            </div>
+                        )}
                     </section>
 
                     {/* ── Security ────────────────────────────────────────── */}

@@ -38,9 +38,9 @@ export default function ChatInput({
   };
 
   return (
-    <div className="border-t border-border bg-surface-0 px-4 py-3">
+    <div className="bg-gradient-to-t from-surface-0 via-surface-0/90 to-transparent px-6 pb-6 pt-4 relative z-20">
       {/* Input box */}
-      <div className="bg-surface-2 border border-border rounded-xl focus-within:border-indigo-500/50 focus-within:ring-1 focus-within:ring-indigo-500/20 transition-all">
+      <div className="glass-panel rounded-2xl shadow-2xl focus-within:border-indigo-500/50 focus-within:ring-2 focus-within:ring-indigo-500/30 transition-all duration-300">
         <textarea
           ref={textareaRef}
           value={value}
@@ -49,7 +49,7 @@ export default function ChatInput({
           disabled={isGenerating}
           rows={1}
           placeholder="Describe a task you want the AI to automate…"
-          className="w-full bg-transparent text-sm text-slate-200 placeholder-slate-500 px-4 pt-3 pb-2 resize-none outline-none leading-relaxed disabled:opacity-50"
+          className="w-full bg-transparent text-sm text-slate-200 placeholder-slate-500 px-5 pt-4 pb-2 resize-none outline-none leading-relaxed disabled:opacity-50"
           style={{ maxHeight: '200px', minHeight: '44px' }}
         />
         {/* Toolbar */}
@@ -69,7 +69,7 @@ export default function ChatInput({
                 <button
                   onClick={handleSend}
                   disabled={!value.trim()}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-medium rounded-lg transition-colors"
+                  className="btn-primary px-4 py-1.5 text-xs rounded-xl shadow-md"
                 >
                   <Wand2 size={13} />
                   Generate
@@ -77,7 +77,7 @@ export default function ChatInput({
                 <button
                   onClick={handleSend}
                   disabled={!value.trim()}
-                  className="p-1.5 rounded-lg bg-surface-4 hover:bg-surface-5 disabled:opacity-40 disabled:cursor-not-allowed text-slate-300 transition-colors"
+                  className="p-2 rounded-xl bg-surface-3/50 hover:bg-surface-4 disabled:opacity-40 disabled:cursor-not-allowed text-slate-300 transition-all duration-200 hover:text-white backdrop-blur-sm"
                   title="Send"
                 >
                   <Send size={14} />
@@ -89,9 +89,9 @@ export default function ChatInput({
       </div>
 
       {/* Hint */}
-      <p className="text-center text-[11px] text-slate-600 mt-2">
-        Press <kbd className="bg-surface-3 border border-border rounded px-1 py-0.5 text-[10px] font-mono">Enter</kbd> to send ·{' '}
-        <kbd className="bg-surface-3 border border-border rounded px-1 py-0.5 text-[10px] font-mono">Shift+Enter</kbd> for new line
+      <p className="text-center text-[11px] text-slate-500 mt-3 drop-shadow-sm">
+        Press <kbd className="bg-surface-3/50 border border-white/5 rounded px-1.5 py-0.5 text-[10px] font-mono shadow-sm">Enter</kbd> to send ·{' '}
+        <kbd className="bg-surface-3/50 border border-white/5 rounded px-1.5 py-0.5 text-[10px] font-mono shadow-sm">Shift+Enter</kbd> for new line
       </p>
     </div>
   );

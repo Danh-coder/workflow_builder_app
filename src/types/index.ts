@@ -100,7 +100,8 @@ export interface AppSettings {
   tokenBudget: number;
   currentOS: OS;
   adapterStatus: Adapter;
-  theme: 'dark' | 'light' | 'system';
+  theme: 'dark' | 'light' | 'system' | 'blossom' | 'rainy' | 'cyberpunk';
+  effectFrequency: number;
   askBeforeRiskyActions: boolean;
   blockDestructiveActions: boolean;
   saveScreenshotsOnError: boolean;
