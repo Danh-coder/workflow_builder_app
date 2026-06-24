@@ -111,10 +111,14 @@ export default function RunControlPanel({
       {!isRunning ? (
         <button
           onClick={onRun}
-          className="btn-primary w-full justify-center py-2.5 mb-3"
+          className="btn-primary w-full justify-center py-2.5 mb-3 relative group/run"
         >
           <Play size={15} fill="currentColor" />
           Run Workflow
+          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-[240px] p-2.5 bg-red-500/95 backdrop-blur-sm text-white text-[11px] font-medium leading-relaxed rounded-lg shadow-xl opacity-0 group-hover/run:opacity-100 transition-all duration-200 pointer-events-none z-[100] text-center border border-red-400/30 scale-95 group-hover/run:scale-100">
+            Warning: Workflow about to run. Please remove your hands and do not touch the keyboard or mouse.
+            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-red-500/95 rotate-45 border-r border-b border-red-400/30"></div>
+          </div>
         </button>
       ) : (
         <div className="flex gap-2 mb-3">

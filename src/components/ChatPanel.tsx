@@ -137,7 +137,10 @@ export default function ChatPanel({
   const isEmpty = messages.length === 0 && !isGenerating;
 
   return (
-    <div className="flex flex-col h-full bg-transparent relative">
+    <div className="flex flex-col h-full bg-transparent relative overflow-hidden">
+      {theme === 'blossom' && <BlossomEffect />}
+      {theme === 'rainy' && <RainEffect />}
+      
       {/* Header */}
       <div className="px-6 pt-5 pb-4 border-b border-white/5 flex items-start justify-between gap-4 flex-shrink-0 z-10 glass-panel border-x-0 border-t-0 shadow-none">
         <div>
@@ -193,9 +196,7 @@ export default function ChatPanel({
       </div>
 
       {/* Messages area */}
-      <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5 relative">
-        {theme === 'blossom' && <BlossomEffect />}
-        {theme === 'rainy' && <RainEffect />}
+      <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5 relative z-10">
         
         {isEmpty ? (
           /* Empty state */

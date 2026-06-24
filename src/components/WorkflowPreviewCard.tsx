@@ -132,10 +132,14 @@ export default function WorkflowPreviewCard({
             </button>
             <button
               onClick={() => onRunNow(workflow)}
-              className="btn-primary text-xs py-1.5 flex-1 justify-center"
+              className="btn-primary text-xs py-1.5 flex-1 justify-center relative group/run"
             >
               <Play size={13} fill="currentColor" />
               Run Now
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-[240px] p-2.5 bg-red-500/95 backdrop-blur-sm text-white text-[11px] font-medium leading-relaxed rounded-lg shadow-xl opacity-0 group-hover/run:opacity-100 transition-all duration-200 pointer-events-none z-[100] text-center border border-red-400/30 scale-95 group-hover/run:scale-100">
+                Warning: Workflow about to run. Please remove your hands and do not touch the keyboard or mouse.
+                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-red-500/95 rotate-45 border-r border-b border-red-400/30"></div>
+              </div>
             </button>
           </>
         )}
