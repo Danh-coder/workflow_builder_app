@@ -546,4 +546,177 @@
 .cursor-particle-cyberpunk {
   animation: cursorSpark 0.5s ease-out forwards;
 }
+/* -- Rain Splash Recoil (3D) ------------------------------ */
 
+@keyframes rainSplashRecoil {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: brightness(1.5) blur(0px);
+  }
+  30% {
+    opacity: 0.85;
+    transform: translate3d(var(--splash-x, 0px), var(--splash-y, -40px), 60px) scale(0.6);
+    filter: brightness(2) blur(1px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--splash-x, 0px), var(--splash-y, -100px), 120px) scale(0);
+    filter: brightness(3) blur(3px);
+  }
+}
+
+@keyframes rainSprayFast {
+  0% {
+    opacity: 0.9;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--spray-x, 0px), var(--spray-y, -50px), 30px) scale(0);
+  }
+}
+
+@keyframes rainRippleRing {
+  0% {
+    opacity: 0.9;
+    transform: perspective(400px) rotateX(70deg) scale(0.2);
+    border-width: 3px;
+  }
+  50% {
+    opacity: 0.4;
+    border-width: 1px;
+  }
+  100% {
+    opacity: 0;
+    transform: perspective(400px) rotateX(70deg) scale(3);
+    border-width: 0px;
+  }
+}
+
+@keyframes rainImpactFlash {
+  0% {
+    opacity: 0.9;
+    transform: perspective(300px) rotateX(70deg) scale(0.3);
+  }
+  40% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0;
+    transform: perspective(300px) rotateX(70deg) scale(1.5);
+  }
+}
+
+.rain-splash-particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9996;
+  border-radius: 50%;
+  animation: rainSplashRecoil 0.7s cubic-bezier(0.15, 0.6, 0.3, 1) forwards;
+  box-shadow: 0 0 4px rgba(56, 189, 248, 0.6), 0 0 8px rgba(56, 189, 248, 0.3);
+}
+
+.rain-spray-particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9995;
+  border-radius: 50%;
+  animation: rainSprayFast 0.5s ease-out forwards;
+  box-shadow: 0 0 2px rgba(148, 197, 255, 0.4);
+}
+
+.rain-ripple-ring {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9994;
+  border-radius: 50%;
+  border: 3px solid rgba(56, 189, 248, 0.6);
+  transform-origin: center center;
+  animation: rainRippleRing 0.75s ease-out forwards;
+}
+
+.rain-impact-flash {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9993;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.7), rgba(56, 189, 248, 0.3), transparent 70%);
+  transform-origin: center center;
+  animation: rainImpactFlash 0.5s ease-out forwards;
+}
+
+/* -- Cyberpunk Blowback (3D) ---------------------------- */
+
+@keyframes cyberBlowback {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: brightness(2) blur(0px);
+  }
+  40% {
+    opacity: 0.7;
+    transform: translate3d(var(--blow-x, 0px), var(--blow-y, -70px), 100px) scale(0.5);
+    filter: brightness(2.5) blur(1px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--blow-x, 0px), var(--blow-y, -160px), 200px) scale(0);
+    filter: brightness(3) blur(4px);
+  }
+}
+
+@keyframes cyberBlowFlash {
+  0% {
+    opacity: 1;
+    transform: perspective(500px) rotateX(-55deg) scaleY(0.05) scaleX(0.2);
+  }
+  25% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: perspective(500px) rotateX(-55deg) scaleY(1.5) scaleX(2.5);
+  }
+}
+
+@keyframes cyberShockwave {
+  0% {
+    opacity: 0.9;
+    transform: perspective(400px) rotateX(-50deg) scale(0.3);
+    border-width: 3px;
+  }
+  100% {
+    opacity: 0;
+    transform: perspective(400px) rotateX(-50deg) scale(3.5);
+    border-width: 0px;
+  }
+}
+
+.cyber-blowback-particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9996;
+  border-radius: 2px;
+  animation: cyberBlowback 0.7s cubic-bezier(0.15, 0.7, 0.25, 1) forwards;
+  box-shadow: 0 0 8px currentColor, 0 0 16px currentColor, 0 0 24px currentColor;
+}
+
+.cyber-blowback-flash {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9994;
+  background: radial-gradient(ellipse at 50% 100%, rgba(250, 204, 21, 0.8), rgba(168, 85, 247, 0.4) 50%, transparent 80%);
+  transform-origin: bottom center;
+  animation: cyberBlowFlash 0.55s ease-out forwards;
+}
+
+.cyber-blowback-shockwave {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9995;
+  border-radius: 50%;
+  border: 3px solid rgba(250, 204, 21, 0.6);
+  transform-origin: center center;
+  animation: cyberShockwave 0.65s ease-out forwards;
+}

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bot, User, Sparkles, ChevronDown, Copy, Check } from 'lucide-react';
 import { ChatMessage, Workflow, ModelEntry } from '../types';
@@ -41,6 +41,9 @@ function BlossomEffect() {
 }
 
 function RainEffect() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const animFrameRef = useRef<number>(0);
+
   const drops = Array.from({ length: 60 }).map((_, i) => ({
     id: i,
     left: `${Math.random() * 100}%`,
@@ -49,26 +52,127 @@ function RainEffect() {
     opacity: 0.2 + Math.random() * 0.5,
   }));
 
+  const spawnSplash = useCallback((x: number, y: number) => {
+    if (!containerRef.current) return;
+
+    // Bright impact flash at strike point (3D perspective ellipse)
+    const flash = document.createElement("div");
+    flash.className = "rain-impact-flash";
+    flash.style.left = `${x - 20}px`;
+    flash.style.top = `${y - 15}px`;
+    flash.style.width = "40px";
+    flash.style.height = "30px";
+    containerRef.current.appendChild(flash);
+    setTimeout(() => flash.remove(), 550);
+
+    // Central 3D ripple ring (lies flat on the surface with perspective)
+    const ring = document.createElement("div");
+    ring.className = "rain-ripple-ring";
+    ring.style.left = `${x - 12}px`;
+    ring.style.top = `${y - 5}px`;
+    ring.style.width = "24px";
+    ring.style.height = "24px";
+    containerRef.current.appendChild(ring);
+    setTimeout(() => ring.remove(), 800);
+
+    // Main splash droplets scatter upward/outward in 3D
+    const splashCount = 10 + Math.floor(Math.random() * 7);
+    for (let i = 0; i < splashCount; i++) {
+      const droplet = document.createElement("div");
+      const size = 3 + Math.random() * 7;
+      const angle = (Math.PI * 0.5) + ((Math.random() - 0.5) * Math.PI * 1.6);
+      const dist = 25 + Math.random() * 65;
+      const sx = Math.cos(angle) * dist;
+      const sy = Math.sin(angle) * dist;
+
+      droplet.className = "rain-splash-particle";
+      droplet.style.left = `${x - size / 2}px`;
+      droplet.style.top = `${y - size / 2}px`;
+      droplet.style.width = `${size}px`;
+      droplet.style.height = `${size}px`;
+      droplet.style.backgroundColor = Math.random() > 0.4
+        ? "rgba(56, 189, 248, 0.7)"
+        : "rgba(255, 255, 255, 0.6)";
+      droplet.style.setProperty("--splash-x", `${sx}px`);
+      droplet.style.setProperty("--splash-y", `${sy}px`);
+      containerRef.current.appendChild(droplet);
+      setTimeout(() => droplet.remove(), 750);
+    }
+
+    // Fast spray mist
+    const sprayCount = 6 + Math.floor(Math.random() * 5);
+    for (let i = 0; i < sprayCount; i++) {
+      const spray = document.createElement("div");
+      const size = 1 + Math.random() * 3;
+      const sx = (Math.random() - 0.5) * 80;
+      const sy = -(20 + Math.random() * 45);
+
+      spray.className = "rain-spray-particle";
+      spray.style.left = `${x - size / 2}px`;
+      spray.style.top = `${y - size / 2}px`;
+      spray.style.width = `${size}px`;
+      spray.style.height = `${size}px`;
+      spray.style.backgroundColor = "rgba(186, 230, 253, 0.45)";
+      spray.style.setProperty("--spray-x", `${sx}px`);
+      spray.style.setProperty("--spray-y", `${sy}px`);
+      containerRef.current.appendChild(spray);
+      setTimeout(() => spray.remove(), 550);
+    }
+  }, []);
+
+  // Splash collision loop across input area top edge
+  useEffect(() => {
+    const inputEl = document.querySelector(".glass-panel.rounded-2xl");
+    if (!inputEl || !containerRef.current) return;
+
+    let lastSplashTime = 0;
+    const splashMinInterval = 70;
+
+    const tick = () => {
+      const now = performance.now();
+      if (now - lastSplashTime < splashMinInterval) {
+        animFrameRef.current = requestAnimationFrame(tick);
+        return;
+      }
+
+      const rect = inputEl.getBoundingClientRect();
+      const x = rect.left + Math.random() * rect.width;
+      const y = rect.top - 3 + Math.random() * 6;
+
+      spawnSplash(x, y);
+      lastSplashTime = now;
+
+      setTimeout(() => {
+        animFrameRef.current = requestAnimationFrame(tick);
+      }, splashMinInterval + Math.random() * 100);
+    };
+
+    animFrameRef.current = requestAnimationFrame(tick);
+
+    return () => {
+      cancelAnimationFrame(animFrameRef.current);
+    };
+  }, [spawnSplash]);
+
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+    <div ref={containerRef} className="absolute inset-0 pointer-events-none overflow-hidden z-0">
       {drops.map((d) => (
         <div
           key={d.id}
           className="absolute w-[1px] h-12 bg-white/60 animate-rain-fall"
           style={{
             left: d.left,
-            top: '-48px',
+            top: "-48px",
             opacity: 0,
             animationDelay: d.animationDelay,
             animationDuration: d.animationDuration,
-            animationFillMode: 'none',
+            animationFillMode: "none",
           }}
         />
       ))}
     </div>
   );
 }
-
 interface ChatPanelProps {
   theme?: string;
   messages: ChatMessage[];
