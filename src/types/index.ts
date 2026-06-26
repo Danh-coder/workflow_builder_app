@@ -108,6 +108,7 @@ export interface AppSettings {
   storeApiKeySecurely: boolean;
   autoUpdate: boolean;
   localDataPath: string;
+  customThemeColors?: Record<string, Record<string, string>>;
 }
 
 export interface Permission {

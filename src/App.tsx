@@ -193,7 +193,26 @@ export default function App() {
         document.documentElement.classList.add('theme-light');
       }
     }
-  }, [appSettings.theme]);
+
+    // Apply custom theme colors
+    const rootStyle = document.documentElement.style;
+    const customizableVars = [
+      '--color-surface-0',
+      '--color-surface-1',
+      '--color-surface-2',
+      '--color-slate-50',
+      '--color-border',
+      '--color-primary-500',
+    ];
+    customizableVars.forEach(v => rootStyle.removeProperty(v));
+
+    const customColors = appSettings.customThemeColors?.[appSettings.theme];
+    if (customColors) {
+      Object.entries(customColors).forEach(([key, value]) => {
+        rootStyle.setProperty(key, value);
+      });
+    }
+  }, [appSettings.theme, appSettings.customThemeColors]);
 
   // ── Chat session persistence ──────────────────────────────────────
   const [chatSessions, setChatSessions] = useState<ChatSession[]>(() => loadSessions());
@@ -1004,6 +1023,9 @@ export default function App() {
           )}
           {currentPage === 'settings' && (
             <SettingsPage
+              onLiveUpdate={(patch) => {
+                setAppSettings(prev => ({ ...prev, ...patch }));
+              }}
               onDirtyChange={(dirty) => { settingsDirty.current = dirty; }}
               onSave={(saved) => {
                 setAppSettings(saved);

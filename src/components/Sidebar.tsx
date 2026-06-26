@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import {
   Zap,
@@ -107,16 +108,32 @@ export default function Sidebar({
       {/* Navigation */}
       <nav className="px-2 flex-1 overflow-y-auto">
         <div className="space-y-0.5">
-          {navItems.map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              onClick={() => onNavigate(id)}
-              className={clsx('nav-item w-full text-left', currentPage === id ? 'nav-item-active' : 'nav-item-inactive')}
-            >
-              <Icon size={16} className="flex-shrink-0" />
-              <span>{label}</span>
-            </button>
-          ))}
+          {navItems.map(({ id, label, icon: Icon }) => {
+            const isActive = currentPage === id;
+            return (
+              <button
+                key={id}
+                onClick={() => onNavigate(id)}
+                className={clsx(
+                  'nav-item w-full text-left relative overflow-hidden group',
+                  isActive ? 'text-indigo-300' : 'text-slate-400 hover:text-slate-200 hover:bg-surface-2'
+                )}
+              >
+                {isActive && (
+                  <motion.div
+                    layoutId="sidebar-active-bg"
+                    className="absolute inset-0 bg-indigo-500/10 border-l-2 border-indigo-500 shadow-[inset_4px_0_15px_rgba(99,102,241,0.2)]"
+                    initial={false}
+                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  />
+                )}
+                <div className="relative z-10 flex items-center gap-3 w-full">
+                  <Icon size={16} className={clsx("flex-shrink-0 transition-colors", isActive ? "text-indigo-400 drop-shadow-[0_0_8px_rgba(99,102,241,0.8)]" : "")} />
+                  <span className="flex-1">{label}</span>
+                </div>
+              </button>
+            );
+          })}
         </div>
 
         {/* Recent Chats */}
@@ -205,30 +222,38 @@ export default function Sidebar({
           </button>
 
           {/* Dropdown */}
-          {providerOpen && (
-            <div className="absolute bottom-full left-0 right-0 mb-2 glass-panel rounded-xl overflow-hidden z-50 animate-scale-in">
-              <div className="px-3 py-2 border-b border-white/5">
-                <div className="text-[10px] text-slate-500 uppercase tracking-widest">AI Provider</div>
-              </div>
-              {allProviders.map(p => (
-                <button
-                  key={p}
-                  onClick={() => { onProviderChange(p); setProviderOpen(false); }}
-                  className={clsx(
-                    'w-full flex items-center gap-2 px-3 py-2 text-left transition-colors hover:bg-surface-4 text-xs',
-                    p === aiProvider ? 'bg-indigo-500/10 text-indigo-300' : 'text-slate-300',
-                  )}
-                >
-                  {p === aiProvider && <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 flex-shrink-0" />}
-                  {p !== aiProvider && <span className="w-1.5 h-1.5 flex-shrink-0" />}
-                  {p}
-                  {p === 'AIHoc' && (
-                    <span className="ml-auto text-[9px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded-full border border-emerald-500/20">free</span>
-                  )}
-                </button>
-              ))}
-            </div>
-          )}
+          <AnimatePresence>
+            {providerOpen && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                transition={{ duration: 0.15 }}
+                className="absolute bottom-full left-0 right-0 mb-2 glass-panel rounded-xl overflow-hidden z-50 shadow-[0_0_20px_rgba(0,0,0,0.6)] border border-indigo-500/20"
+              >
+                <div className="px-3 py-2 border-b border-white/5">
+                  <div className="text-[10px] text-slate-500 uppercase tracking-widest">AI Provider</div>
+                </div>
+                {allProviders.map(p => (
+                  <button
+                    key={p}
+                    onClick={() => { onProviderChange(p); setProviderOpen(false); }}
+                    className={clsx(
+                      'w-full flex items-center gap-2 px-3 py-2 text-left transition-colors hover:bg-surface-4 text-xs',
+                      p === aiProvider ? 'bg-indigo-500/20 text-indigo-300' : 'text-slate-300 hover:text-indigo-200',
+                    )}
+                  >
+                    {p === aiProvider && <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 flex-shrink-0 shadow-[0_0_5px_rgba(99,102,241,1)]" />}
+                    {p !== aiProvider && <span className="w-1.5 h-1.5 flex-shrink-0" />}
+                    {p}
+                    {p === 'AIHoc' && (
+                      <span className="ml-auto text-[9px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded-full border border-emerald-500/20">free</span>
+                    )}
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </aside>

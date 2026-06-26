@@ -55,10 +55,10 @@ export default function RunControlPanel({
               </span>
               <span className="text-slate-500 font-mono">{elapsed}</span>
             </div>
-            <div className="h-1.5 bg-surface-4 rounded-full overflow-hidden">
+            <div className="h-1.5 bg-surface-4 rounded-full overflow-hidden shadow-[inset_0_1px_3px_rgba(0,0,0,0.5)]">
               <div
-                className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-700 progress-running"
-                style={{ width: `${progress}%` }}
+                className="h-full bg-[length:200%_100%] bg-gradient-to-r from-indigo-500 via-cyan-400 to-indigo-500 rounded-full transition-all duration-700 animate-border-flow"
+                style={{ width: `${progress}%`, boxShadow: '0 0 10px rgba(6, 182, 212, 0.5)' }}
               />
             </div>
             <div className="flex items-center justify-between text-[10px] mt-1">
@@ -111,8 +111,10 @@ export default function RunControlPanel({
       {!isRunning ? (
         <button
           onClick={onRun}
-          className="btn-primary w-full justify-center py-2.5 mb-3 relative group/run"
+          className="btn-primary w-full justify-center py-2.5 mb-3 relative group/run overflow-hidden"
         >
+          {/* Animated gradient overlay for the run button */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover/run:translate-x-[100%] transition-transform duration-1000"></div>
           <Play size={15} fill="currentColor" />
           Run Workflow
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-[240px] p-2.5 bg-red-500/95 backdrop-blur-sm text-white text-[11px] font-medium leading-relaxed rounded-lg shadow-xl opacity-0 group-hover/run:opacity-100 transition-all duration-200 pointer-events-none z-[100] text-center border border-red-400/30 scale-95 group-hover/run:scale-100">

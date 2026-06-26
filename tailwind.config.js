@@ -81,6 +81,10 @@ export default {
         'rain-fall': 'rainFall 1s linear infinite',
         'lightning-flash': 'lightningFlash 10s infinite',
         'electric-flash': 'electricFlash 8s infinite',
+        'gradient-shift': 'gradientShift 8s ease infinite',
+        'pulse-glow': 'pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'border-flow': 'borderFlow 3s linear infinite',
+        'scanline': 'scanline 4s linear infinite',
       },
       keyframes: {
         fadeIn: {
@@ -133,6 +137,23 @@ export default {
           '41%': { opacity: '0.15' },
           '43%': { opacity: '0.05' },
           '81%': { opacity: '0.1' },
+        },
+        gradientShift: {
+          '0%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+          '100%': { backgroundPosition: '0% 50%' },
+        },
+        pulseGlow: {
+          '0%, 100%': { opacity: '1', filter: 'brightness(1)' },
+          '50%': { opacity: '0.8', filter: 'brightness(1.5) drop-shadow(0 0 10px rgba(99, 102, 241, 0.6))' },
+        },
+        borderFlow: {
+          '0%': { backgroundPosition: '0% 0%' },
+          '100%': { backgroundPosition: '200% 0%' },
+        },
+        scanline: {
+          '0%': { transform: 'translateY(-100%)' },
+          '100%': { transform: 'translateY(100%)' },
         },
       },
     },

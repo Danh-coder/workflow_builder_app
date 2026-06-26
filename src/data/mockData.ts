@@ -304,6 +304,7 @@ export const defaultSettings: AppSettings = {
   storeApiKeySecurely: true,
   autoUpdate: true,
   localDataPath: 'C:\\Users\\ADMIN\\.workflow-agent',
+  customThemeColors: {},
 };
 
 export const aiResponses: Record<string, { content: string; workflow?: Workflow }> = {

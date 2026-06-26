@@ -52,6 +52,7 @@ export default function StatusBadge({ status, size = 'sm', pulse = false }: Stat
           config.dotColor,
           size === 'sm' ? 'w-1.5 h-1.5' : 'w-2 h-2',
           (pulse || status === 'Running') && 'animate-pulse-dot',
+          (status === 'Running' || status === 'Connected' || status === 'Ready') && 'shadow-[0_0_8px_currentColor]'
         )}
       />
       {config.label}

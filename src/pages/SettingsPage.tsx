@@ -36,6 +36,18 @@ function uid() {
     return Math.random().toString(36).slice(2, 10);
 }
 
+function hexToRgbStr(hex: string): string {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? `${parseInt(result[1], 16)} ${parseInt(result[2], 16)} ${parseInt(result[3], 16)}` : '255 255 255';
+}
+
+function rgbStrToHex(rgbStr: string): string {
+    if (!rgbStr) return '#ffffff';
+    const parts = rgbStr.split(' ').map(n => parseInt(n, 10));
+    if (parts.length !== 3 || parts.some(isNaN)) return '#ffffff';
+    return '#' + parts.map(x => x.toString(16).padStart(2, '0')).join('');
+}
+
 const aiProviders: AIProvider[] = [
     "AIHoc",
     "OpenAI",
@@ -302,13 +314,90 @@ function ModelRow({
     );
 }
 
+function ThemeCustomizer({
+    currentTheme,
+    customColors,
+    onChange,
+    onRestore,
+}: {
+    currentTheme: string;
+    customColors: Record<string, string>;
+    onChange: (key: string, value: string) => void;
+    onRestore: () => void;
+}) {
+    const colorFields = [
+        { label: 'Background', varName: '--color-surface-0' },
+        { label: 'Panels', varName: '--color-surface-2' },
+        { label: 'Primary Text', varName: '--color-slate-50' },
+        { label: 'Secondary Text', varName: '--color-slate-400' },
+        { label: 'Border', varName: '--color-border' },
+        { label: 'Accent', varName: '--color-primary-500' },
+    ];
+
+    const [defaultColors, setDefaultColors] = useState<Record<string, string>>({});
+
+    useEffect(() => {
+        // Read defaults slightly after render to ensure theme classes are applied
+        const timer = setTimeout(() => {
+            const computed = getComputedStyle(document.documentElement);
+            const defaults: Record<string, string> = {};
+            colorFields.forEach(field => {
+                defaults[field.varName] = computed.getPropertyValue(field.varName).trim();
+            });
+            setDefaultColors(defaults);
+        }, 50);
+        return () => clearTimeout(timer);
+    }, [currentTheme, customColors]);
+
+    return (
+        <div className="mt-4 pt-4 border-t border-border animate-fade-in">
+            <div className="flex items-center justify-between mb-3">
+                <div className="text-xs font-semibold text-slate-300">
+                    Customize Colors
+                </div>
+                {Object.keys(customColors).length > 0 && (
+                    <button
+                        onClick={onRestore}
+                        className="btn-ghost text-[10px] py-1 px-2"
+                    >
+                        Restore Defaults
+                    </button>
+                )}
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {colorFields.map(field => {
+                    const rgbStr = customColors[field.varName] || defaultColors[field.varName] || '0 0 0';
+                    const hex = rgbStrToHex(rgbStr);
+                    return (
+                        <div key={field.varName} className="flex items-center gap-2 bg-surface-3 border border-border rounded-lg p-2 overflow-hidden">
+                            <div className="relative w-6 h-6 rounded flex-shrink-0 overflow-hidden border border-border-bright">
+                                <input
+                                    type="color"
+                                    value={hex}
+                                    onChange={(e) => {
+                                        onChange(field.varName, hexToRgbStr(e.target.value));
+                                    }}
+                                    className="absolute -top-2 -left-2 w-10 h-10 cursor-pointer p-0 m-0 border-0 outline-none"
+                                />
+                            </div>
+                            <span className="text-[11px] text-slate-400 truncate">{field.label}</span>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
+
 // ── Main ───────────────────────────────────────────────────────────
 export default function SettingsPage({
     onDirtyChange,
     onSave,
+    onLiveUpdate,
 }: {
     onDirtyChange?: (dirty: boolean) => void;
     onSave?: (saved: AppSettings) => void;
+    onLiveUpdate?: (patch: Partial<AppSettings>) => void;
 }) {
     const savedSnapshot = useRef(loadSettings());
     const [settings, setSettings] = useState<AppSettings>(
@@ -1110,7 +1199,10 @@ export default function SettingsPage({
                                 {(["dark", "light", "system", "blossom", "rainy", "cyberpunk"] as const).map((t) => (
                                     <button
                                         key={t}
-                                        onClick={() => update({ theme: t })}
+                                        onClick={() => {
+                                            update({ theme: t });
+                                            onLiveUpdate?.({ theme: t });
+                                        }}
                                         className={clsx(
                                             "px-4 py-2 rounded-xl text-xs font-medium border transition-colors capitalize",
                                             settings.theme === t
@@ -1123,6 +1215,28 @@ export default function SettingsPage({
                                 ))}
                             </div>
                         </div>
+
+                        <ThemeCustomizer
+                            currentTheme={settings.theme}
+                            customColors={settings.customThemeColors?.[settings.theme] || {}}
+                            onChange={(key, value) => {
+                                const updatedColors = {
+                                    ...(settings.customThemeColors || {}),
+                                    [settings.theme]: {
+                                        ...(settings.customThemeColors?.[settings.theme] || {}),
+                                        [key]: value
+                                    }
+                                };
+                                update({ customThemeColors: updatedColors });
+                                onLiveUpdate?.({ customThemeColors: updatedColors });
+                            }}
+                            onRestore={() => {
+                                const updatedColors = { ...(settings.customThemeColors || {}) };
+                                delete updatedColors[settings.theme];
+                                update({ customThemeColors: updatedColors });
+                                onLiveUpdate?.({ customThemeColors: updatedColors });
+                            }}
+                        />
 
                         {(settings.theme === 'rainy' || settings.theme === 'cyberpunk') && (
                             <div className="mt-4 pt-4 border-t border-border animate-fade-in">

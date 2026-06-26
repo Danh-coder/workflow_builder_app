@@ -40,18 +40,23 @@ export default function ChatInput({
   return (
     <div className="bg-gradient-to-t from-surface-0 via-surface-0/90 to-transparent px-6 pb-6 pt-4 relative z-20">
       {/* Input box */}
-      <div className="glass-panel rounded-2xl shadow-2xl focus-within:border-indigo-500/50 focus-within:ring-2 focus-within:ring-indigo-500/30 transition-all duration-300">
-        <textarea
-          ref={textareaRef}
-          value={value}
-          onChange={(e) => { setValue(e.target.value); handleInput(); }}
-          onKeyDown={handleKeyDown}
-          disabled={isGenerating}
-          rows={1}
-          placeholder="Describe a task you want the AI to automate…"
-          className="w-full bg-transparent text-sm text-slate-200 placeholder-slate-500 px-5 pt-4 pb-2 resize-none outline-none leading-relaxed disabled:opacity-50"
-          style={{ maxHeight: '200px', minHeight: '44px' }}
-        />
+      <div className="glass-panel rounded-2xl shadow-[0_0_20px_rgba(0,0,0,0.6)] focus-within:shadow-[0_0_20px_rgba(99,102,241,0.3)] focus-within:border-indigo-400 relative p-[1px] transition-all duration-300 group/input">
+        {/* Animated gradient border glow element that shows only when focused */}
+        <div className="absolute inset-0 opacity-0 group-focus-within/input:opacity-100 pointer-events-none transition-opacity duration-500 rounded-2xl overflow-hidden">
+          <div className="absolute inset-[-50%] bg-[length:200%_100%] bg-gradient-to-r from-indigo-500 via-cyan-400 to-indigo-500 animate-border-flow blur-[4px] opacity-40"></div>
+        </div>
+        <div className="relative z-10 bg-surface-1/90 backdrop-blur-xl rounded-[15px] h-full flex flex-col">
+          <textarea
+            ref={textareaRef}
+            value={value}
+            onChange={(e) => { setValue(e.target.value); handleInput(); }}
+            onKeyDown={handleKeyDown}
+            disabled={isGenerating}
+            rows={1}
+            placeholder="Describe a task you want the AI to automate…"
+            className="w-full bg-transparent text-sm text-slate-200 placeholder-slate-500 px-5 pt-4 pb-2 resize-none outline-none leading-relaxed disabled:opacity-50"
+            style={{ maxHeight: '200px', minHeight: '44px' }}
+          />
         {/* Toolbar */}
         <div className="flex items-center justify-end px-3 pb-2.5 gap-2">
           <div className="flex items-center gap-2">
@@ -85,6 +90,7 @@ export default function ChatInput({
               </>
             )}
           </div>
+        </div>
         </div>
       </div>
 

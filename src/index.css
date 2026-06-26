@@ -271,11 +271,11 @@
 @layer components {
   /* Dynamic Glass Panels */
   .glass-panel {
-    @apply bg-surface-1/70 backdrop-blur-xl border border-white/5 shadow-xl;
+    @apply bg-surface-1/70 backdrop-blur-xl border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.5)];
   }
 
   .glass-card {
-    @apply bg-surface-2/60 backdrop-blur-lg border border-white/5 hover:border-white/10 hover:bg-surface-3/60 transition-all duration-300;
+    @apply bg-surface-2/60 backdrop-blur-lg border border-white/5 hover:border-indigo-500/50 hover:bg-surface-3/80 hover:shadow-[0_0_15px_rgba(99,102,241,0.2)] transition-all duration-300;
   }
 
   /* Buttons */
@@ -316,22 +316,6 @@
 
   .nav-item-inactive {
     @apply text-slate-400 hover:text-slate-200 hover:bg-surface-2;
-  }
-
-  .nav-item-active {
-    @apply text-indigo-300 bg-indigo-500/10 border-none;
-  }
-
-  .nav-item-active::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 3px;
-    height: 60%;
-    background: #818CF8;
-    border-radius: 0 4px 4px 0;
   }
 
   .section-header {

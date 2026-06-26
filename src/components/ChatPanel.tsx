@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Bot, User, Sparkles, ChevronDown, Copy, Check } from 'lucide-react';
 import { ChatMessage, Workflow, ModelEntry } from '../types';
 import WorkflowPreviewCard from './WorkflowPreviewCard';
@@ -162,8 +163,15 @@ export default function ChatPanel({
             <ChevronDown size={11} className="text-slate-500" />
           </button>
 
+          <AnimatePresence>
           {modelOpen && modelEntries.length > 0 && (
-            <div className="absolute top-full right-0 mt-2 w-72 glass-panel rounded-2xl overflow-hidden z-50 animate-scale-in">
+            <motion.div 
+              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.95 }}
+              transition={{ duration: 0.15 }}
+              className="absolute top-full right-0 mt-2 w-72 glass-panel rounded-2xl overflow-hidden z-50 shadow-[0_0_20px_rgba(99,102,241,0.15)] border border-indigo-500/20"
+            >
               <div className="px-3 py-2 border-b border-border">
                 <div className="text-[10px] text-slate-500 uppercase tracking-widest">Select model</div>
               </div>
@@ -185,13 +193,14 @@ export default function ChatPanel({
                       <div className="text-[10px] text-slate-600 font-mono truncate mt-0.5">{m.modelId}</div>
                     </div>
                     {m.id === defaultModelId && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 flex-shrink-0" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 flex-shrink-0 shadow-[0_0_5px_rgba(99,102,241,1)]" />
                     )}
                   </button>
                 ))}
               </div>
-            </div>
+            </motion.div>
           )}
+          </AnimatePresence>
         </div>
       </div>
 
@@ -224,8 +233,15 @@ export default function ChatPanel({
         ) : (
           /* Messages */
           <div className="relative z-10 space-y-5">
+            <AnimatePresence initial={false}>
             {messages.map((msg) => (
-              <div key={msg.id} className={`flex gap-3 animate-slide-up ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+              <motion.div 
+                key={msg.id} 
+                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
+              >
                 {/* Avatar */}
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-md ${
                   msg.role === 'user'
@@ -243,7 +259,7 @@ export default function ChatPanel({
                 <div className={`flex flex-col gap-2 max-w-[85%] ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
                   <div className={`message-content rounded-2xl px-5 py-3.5 text-sm leading-relaxed shadow-sm ${
                     msg.role === 'user'
-                      ? 'bg-gradient-to-br from-indigo-600 to-indigo-500 text-white rounded-tr-sm shadow-indigo-500/20'
+                      ? 'bg-gradient-to-br from-indigo-600 to-indigo-500 text-white rounded-tr-sm shadow-[0_0_15px_rgba(99,102,241,0.3)]'
                       : 'glass-card text-slate-200 rounded-tl-sm'
                   }`}>
                     {msg.content.split('\n').map((line, i) => (
@@ -284,24 +300,32 @@ export default function ChatPanel({
                   )}
                   <span className="text-[10px] text-slate-600 px-1">{formatTime(msg.timestamp)}</span>
                 </div>
-              </div>
+              </motion.div>
             ))}
+            </AnimatePresence>
 
             {/* Typing indicator */}
+            <AnimatePresence>
             {isGenerating && (
-              <div className="flex gap-3 animate-fade-in">
+              <motion.div 
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                className="flex gap-3"
+              >
                 <div className="w-8 h-8 rounded-full glass-card flex items-center justify-center flex-shrink-0 shadow-md">
                   <Bot size={14} className="text-indigo-400" />
                 </div>
-                <div className="glass-card rounded-2xl rounded-tl-sm px-5 py-4">
+                <div className="glass-card rounded-2xl rounded-tl-sm px-5 py-4 border border-indigo-500/20 shadow-[0_0_10px_rgba(99,102,241,0.1)]">
                   <div className="flex gap-1 items-center">
                     <div className="typing-dot" />
                     <div className="typing-dot" />
                     <div className="typing-dot" />
                   </div>
                 </div>
-              </div>
+              </motion.div>
             )}
+            </AnimatePresence>
             <div ref={bottomRef} className="h-4" />
           </div>
         )}
